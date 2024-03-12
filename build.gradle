@@ -5,6 +5,7 @@ plugins {
   id 'org.graalvm.buildtools.native' version '0.9.28'
   id 'io.spring.javaformat' version '0.0.41'
   id "io.spring.nohttp" version "0.0.11"
+  id 'pl.allegro.tech.build.axion-release' version "1.13.12"
 }
 
 apply plugin: 'java'
@@ -14,7 +15,7 @@ apply plugin: 'io.spring.javaformat'
 gradle.startParameter.excludedTaskNames += [ "checkFormatAot", "checkFormatAotTest" ]
 
 group = 'org.springframework.samples'
-version = '3.2.0'
+version = scmVersion.version
 
 java {
   sourceCompatibility = JavaVersion.VERSION_17
@@ -80,3 +81,30 @@ checkFormatAotTest.enabled = false
 
 formatAot.enabled = false
 formatAotTest.enabled = false
+
+tasks.register('openTestResults') {
+  description = 'Opens the rest results in the default web browser'
+  group = 'Help'
+  dependsOn 'build', 'test'
+
+  doLast {
+    // Path to test results dir
+    def testResultsDir = file("$buildDir/reports/tests/test")
+
+    //Check if tests results directory exits
+    if (!testResultsDir.exists()) {
+      logger.warn "Test results directory not found: $testResultsDir"
+      return
+    }
+
+    //Command used to open the test results
+    def command = "open $testResultsDir/index.html"
+
+    //Execute the shell command 
+    exec {
+      commandLine command.split()
+
+    }
+
+  }
+}
