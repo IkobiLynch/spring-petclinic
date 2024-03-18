@@ -11,6 +11,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'checkstyle'
 apply plugin: 'io.spring.javaformat'
+apply plugin: 'maven-publish'
 
 gradle.startParameter.excludedTaskNames += [ "checkFormatAot", "checkFormatAotTest" ]
 
@@ -22,7 +23,10 @@ java {
 }
 
 repositories {
-  mavenCentral()
+  maven {
+    url 'http://localhost:8082/repository/Proxy_Nexus_Tasks/'
+    allowInsecureProtocol = true
+  }
 }
 
 ext.webjarsFontawesomeVersion = "4.7.0"
@@ -108,3 +112,37 @@ tasks.register('openTestResults') {
 
   }
 }
+
+
+// Configure the publication
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            // Define groupId, artifactId, and version if they're not defined in the project's gradle.properties or build.gradle
+            artifactId = 'my-artifact'
+        }
+    }
+    repositories {
+        maven {
+            name = 'nexus'
+            // URL of your Nexus repository
+            url = uri('http://localhost:8082/repository/maven-releases/')
+            allowInsecureProtocol = true
+            // Set your credentials locally using EXPORT NEXUS_USERNAME & EXPORT NEXUS_PASSWORD
+            credentials {
+                username = System.getenv('NEXUS_USERNAME') ?: 'admin' // Nexus username 
+                password = System.getenv('NEXUS_PASSWORD') ?: 'admin123' // Nexus Password
+            }
+        }
+    }
+}
+
+// Register the upload task
+tasks.register('uploadArchives', PublishToMavenRepository) {
+  description = 'Publishes artifacts to Nexus repository'
+  group = 'Publishing'
+  publication = publishing.publications.mavenJava
+  repository = publishing.repositories.nexus
+}
+
