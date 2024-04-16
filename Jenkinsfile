@@ -68,7 +68,8 @@ pipeline {
       steps {
         script {
           docker.withRegistry("${env.NEXUS_MAIN_REPO}", "${env.REGISTRY_CREDENTIALS_ID}") {
-            def app = docker.build("${env.DOCKER_IMAGE}:latest")
+            //def app = docker.build("${env.DOCKER_IMAGE}:latest")
+            def app = docker.build("myapp:latest")
             app.push("latest")
           }
         }
