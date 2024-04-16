@@ -5,6 +5,7 @@ pipeline {
     NEXUS_MR_REPO = "${env.NEXUS_URL}/repository/mr" //path to the specific docker repo appended to nexus url
     NEXUS_MAIN_REPO = "${env.NEXUS_URL}/repository/main" //path to the specific docker repo appended to nexus url
     REGISTRY_CREDENTIALS_ID = 'nexus-credentials' //ID of nexus credentials specified in Jenkins
+    DOCKER_IMAGE = 'spring-petclinic'
   }
   stages {
     stage('Checkstyle') {
