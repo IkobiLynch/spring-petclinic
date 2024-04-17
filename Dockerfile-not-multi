@@ -1,0 +1,17 @@
+# Copies Jar to directory then runs it
+
+# Use OpenJDK as base image
+FROM openjdk:17-jdk-alpine
+
+# set the working directory in the container
+WORKDIR /app
+
+# Copy the jar file from your host to your current location (/app) in the container
+COPY ./build/libs/spring-petclinic-renamed-0.1.2.jar /app/spring-petclinic.jar
+
+# Expose PORT
+EXPOSE 8083
+
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "spring-petclinic.jar"]
+

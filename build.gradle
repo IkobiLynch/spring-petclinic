@@ -26,8 +26,7 @@ repositories {
   maven {
     
     url 'https://repo1.maven.org/maven2/'
-    // url 'http://localhost:8084/repository/Proxy_Nexus_Tasks/'
-    //allowInsecureProtocol = true
+    
   }
 }
 
@@ -129,11 +128,11 @@ publishing {
         maven {
             name = 'nexus'
             // URL of your Nexus repository
-            url = uri('http://localhost:8084/repository/maven-releases/')
+            url = version.endsWith('SNAPSHOT') ? 'http://localhost:8084/repository/maven-snapshots/' : 'http://localhost:8084/repository/maven-releases/'
             allowInsecureProtocol = true
             // Set your credentials locally using EXPORT NEXUS_USERNAME & EXPORT NEXUS_PASSWORD
             credentials {
-                username = System.getenv('NEXUS_USERNAME') ?: 'admin' // Nexus username 
+                username = System.getenv('NEXUS_USERNAME') ?: 'admin' // Nexus username I know I hardcoded the credentials
                 password = System.getenv('NEXUS_PASSWORD') ?: 'password' // Nexus Password
             }
         }

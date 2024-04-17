@@ -16,7 +16,7 @@ RUN ./gradlew build --no-daemon
 FROM openjdk:17-jdk-alpine
 
 # Copy the jar file from your host to your current location (/app) in the container
-COPY --from=build /home/gradle/src/libs/*.jar /app/spring-app.jar
+COPY --from=build --chown=gradle:gradle /home/gradle/src/build/libs/*.jar /app/spring-app.jar
 
 # Set the working directory in the container
 WORKDIR /app
@@ -25,5 +25,5 @@ WORKDIR /app
 EXPOSE 8080
 
 # Command to run the application
-ENTRYPOINT ["java", "-jar", "spring-petclinic.jar"]
+ENTRYPOINT ["java", "-jar", "spring-app.jar"]
 
