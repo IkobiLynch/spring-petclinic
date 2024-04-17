@@ -1,5 +1,10 @@
 pipeline {
-  agent { dockerfile true }
+  agent { 
+    dockerfile {
+      args '-u 1001:1001 --cgroupns=host' // Include additional required arguments for docker run here
+      additionalBuildArgs ''  // Specifiy additional arguments for docker build comman
+    } 
+  }
   environment {
     NEXUS_URL = 'http://127.0.0.1:8081' //local host nexu repo url
     NEXUS_MR_REPO = "${env.NEXUS_URL}/repository/mr" //path to the specific docker repo appended to nexus url
