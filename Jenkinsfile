@@ -1,8 +1,8 @@
 pipeline {
   agent { 
     dockerfile {
+      additionalBuildArgs ''  // Specifiy additional arguments for docker build command
       args '-u 1001:1001 --cgroupns=host' // Include additional required arguments for docker run here
-      additionalBuildArgs ''  // Specifiy additional arguments for docker build comman
     } 
   }
   environment {
