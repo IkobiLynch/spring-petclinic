@@ -76,12 +76,9 @@ pipeline {
       steps {
         script {
           sh 'echo $PATH'
+          def app = docker.build("${env.DOCKERHUB_NAME}/myapp:latest")
+          app.push("latest")
           
-          docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS}") {
-            //def app = docker.build("${env.DOCKER_IMAGE}:latest")
-            def app = docker.build("${env.DOCKERHUB_NAME}/myapp:latest")
-            app.push("latest")
-          }
         }
       }
     }
