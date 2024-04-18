@@ -1,7 +1,7 @@
 pipeline {
   agent { 
     dockerfile {
-      additionalBuildArgs ''  // Specifiy additional arguments for docker build command
+      additionalBuildArgs ''
       args '--cgroupns=host --entrypoint=' // Include additional required arguments for docker run here
     } 
   }
@@ -75,11 +75,12 @@ pipeline {
       }
       steps {
         script {
-          sh 'echo "Test ====== " echo $PATH'
+          sh 'echo "Test ====== $PATH"'
           withEnv(["PATH+DOCKER=/usr/local/bin/docker"]) {
-            sh 'echo "TEST 2 ====" docker --version'
+            sh 'echo "TEST 2 ==== "
+            sh 'docker --version'
           }
-          sh 'echo "TEST AGAIN ====" echo $PATH'
+          sh 'echo "TEST AGAIN ==== $PATH"'
           def app = docker.build("${env.DOCKERHUB_NAME}/myapp:latest")
           app.push("latest")
           
