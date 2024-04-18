@@ -11,7 +11,7 @@ pipeline {
     NEXUS_MAIN_REPO = "${env.NEXUS_URL}/repository/main" //path to the specific docker repo appended to nexus url
     REGISTRY_CREDENTIALS_ID = 'nexus-credentials' //ID of nexus credentials specified in Jenkins
     DOCKER_IMAGE = 'spring-petclinic'
-    DOCKER_REGISTRY = 'docker.io' // Official DOcker Hub URL
+    DOCKER_REGISTRY = 'https://registry.hub.docker.com' // Official DOcker Hub URL
     DOCKERHUB_NAME = 'ikobilynch'
     DOCKERHUB_CREDENTIALS = 'docker_login'
   }
