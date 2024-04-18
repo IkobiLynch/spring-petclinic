@@ -63,8 +63,8 @@ pipeline {
       steps {
         script {
           docker.withRegistry("https://${env.DOCKER_REGISTRY}", "${env.DOCKERHUB_CREDENTIALS}") {
-            def app = docker.build("${env.DOCKERHUB_NAME}/myapp:${env.GIT_COMMIT[0..7]}")
-            app.push()
+            def app = docker.build("${env.DOCKERHUB_NAME}/mr:${env.GIT_COMMIT[0..7]}")
+            app.push("latest")
           }
         }
       }
