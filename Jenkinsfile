@@ -76,7 +76,7 @@ pipeline {
       steps {
         script {
           sh 'echo "Test ====== $PATH"'
-          withEnv(["PATH+DOCKER=/usr/local/bin/docker"]) {
+          withEnv(["PATH+DOCKER=/usr/local/bin/"]) {
             sh 'echo "TEST 2 ==== "'
             sh 'docker --version'
           }
