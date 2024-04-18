@@ -80,7 +80,7 @@ pipeline {
           withEnv(["PATH+DOCKER=/usr/local/bin/docker"]) {
             sh 'echo "TEST 2 ==== $PATH"'
             sh 'docker --version'
-            def app = docker.build("${env.DOCKERHUB_NAME}/myapp:latest")
+            def app = docker.build("${env.DOCKERHUB_NAME}/main:${env.GIT_COMMIT[0..7]}")
             app.push("latest")
           }
           sh 'echo "TEST AGAIN ==== $PATH"'
