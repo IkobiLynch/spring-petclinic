@@ -77,11 +77,11 @@ pipeline {
         script {
           sh 'echo $PATH'
           
-          //docker.withRegistry("https://${env.DOCKER_REGISTRY}", "${env.DOCKERHUB_CREDENTIALS}") {
+          docker.withRegistry('', "${env.DOCKERHUB_CREDENTIALS}") {
             //def app = docker.build("${env.DOCKER_IMAGE}:latest")
             def app = docker.build("${env.DOCKERHUB_NAME}/myapp:latest")
             app.push("latest")
-          //}
+          }
         }
       }
     }
