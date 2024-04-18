@@ -76,6 +76,9 @@ pipeline {
       steps {
         script {
           sh 'echo $PATH'
+          withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIALS', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+            sh 'docker login -u $USERNAME -p $PASSWORD'
+          }
           docker.withRegistry("https://${DOCKER_REGISTRY}", "${env.DOCKERHUB_CREDENTIALS}") {
             //def app = docker.build("${env.DOCKER_IMAGE}:latest")
             def app = docker.build("${DOCKERHUB_NAME}/myapp:latest")
