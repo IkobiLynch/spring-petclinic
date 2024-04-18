@@ -11,6 +11,9 @@ pipeline {
     NEXUS_MAIN_REPO = "${env.NEXUS_URL}/repository/main" //path to the specific docker repo appended to nexus url
     REGISTRY_CREDENTIALS_ID = 'nexus-credentials' //ID of nexus credentials specified in Jenkins
     DOCKER_IMAGE = 'spring-petclinic'
+    DOCKER_REGISTRY = 'docker.io' // Official DOcker Hub URL
+    DOCKERHUB_NAME = 'ikobilynch'
+    DOCKERHUB_CREDENTIALS = 'docker_login'
   }
   stages {
     stage('Checkstyle') {
@@ -58,8 +61,8 @@ pipeline {
       }
       steps {
         script {
-          docker.withRegistry("${env.NEXUS_MR_REPO}", "${env.REGISTRY_CREDENTIALS_ID}") {
-            def app = docker.build("myapp:${env.GIT_COMMIT[0..7]}")
+          docker.withRegistry("https://${DOCKER_REGISTRY}", "${env.DOCKERHUB_CREDENTIALS}") {
+            def app = docker.build("${DOCKERHUB_NAME}/myapp:${env.GIT_COMMIT[0..7]}")
             app.push()
           }
         }
@@ -73,9 +76,9 @@ pipeline {
       steps {
         script {
           sh 'echo $PATH'
-          docker.withRegistry("${env.NEXUS_MAIN_REPO}", "${env.REGISTRY_CREDENTIALS_ID}") {
+          docker.withRegistry("https://${DOCKER_REGISTRY}", "${env.DOCKERHUB_CREDENTIALS}") {
             //def app = docker.build("${env.DOCKER_IMAGE}:latest")
-            def app = docker.build("myapp:latest")
+            def app = docker.build("${DOCKERHUB_NAME}/myapp:latest")
             app.push("latest")
           }
         }
