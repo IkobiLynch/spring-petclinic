@@ -75,11 +75,11 @@ pipeline {
       }
       steps {
         script {
-          sh 'echo $PATH'
+          sh 'Test ====== echo $PATH'
           withEnv(["PATH+DOCKER=/usr/local/bin/docker"]) {
-            sh 'docker --version'
+            sh 'TEST 2 ==== docker --version'
           }
-          sh 'echo $PATH'
+          sh 'TEST AGAIN ==== echo $PATH'
           def app = docker.build("${env.DOCKERHUB_NAME}/myapp:latest")
           app.push("latest")
           
