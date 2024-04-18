@@ -76,7 +76,7 @@ pipeline {
       steps {
         script {
           sh 'echo $PATH'
-          withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIALS', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+          withCredentials([usernamePassword(credentialsId: 'docker_login', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
             sh 'docker login -u $USERNAME -p $PASSWORD'
           }
           docker.withRegistry("https://${DOCKER_REGISTRY}", "${env.DOCKERHUB_CREDENTIALS}") {
