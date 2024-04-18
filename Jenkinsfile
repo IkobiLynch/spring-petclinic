@@ -1,10 +1,11 @@
 pipeline {
-  agent { 
+  agent any
+  /*{ 
     dockerfile {
       additionalBuildArgs ''
       args '--cgroupns=host --entrypoint=' // Include additional required arguments for docker run here
     } 
-  }
+  } */
   environment {
     NEXUS_URL = 'http://localhost:8084' //local host nexu repo url
     NEXUS_MR_REPO = "${env.NEXUS_URL}/repository/mr" //path to the specific docker repo appended to nexus url
@@ -79,10 +80,11 @@ pipeline {
           withEnv(["PATH+DOCKER=/usr/local/bin/docker"]) {
             sh 'echo "TEST 2 ==== $PATH"'
             sh 'docker --version'
+            def app = docker.build("${env.DOCKERHUB_NAME}/myapp:latest")
+            app.push("latest")
           }
           sh 'echo "TEST AGAIN ==== $PATH"'
-          def app = docker.build("${env.DOCKERHUB_NAME}/myapp:latest")
-          app.push("latest")
+          
           
         }
       }
