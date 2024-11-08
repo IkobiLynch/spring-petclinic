@@ -14,8 +14,11 @@ pipeline {
         stage('Clone Repositories') {
             steps {
               //git url: 'https://github.com/IkobiLynch/spring-petclinic.git', branch: "${env.BRANCH_NAME}"
-              
-              git url: 'https://github.com/IkobiLynch/GD_CP_infra.git', branch: 'main'
+              dir('GD_CP_infra'){
+                git url: 'https://github.com/IkobiLynch/GD_CP_infra.git', branch: 'main'
+                sh 'pwd'
+                sh 'ls -al'
+              }
 
               sh 'pwd'
               sh 'ls -al'
@@ -27,7 +30,6 @@ pipeline {
             steps {
               sh 'pwd'
               sh 'ls -al'
-              sh 'ls -al ../'
               echo 'Running static code analysis...'
               sh './gradlew check'
             }
