@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Clone Repositories') {
             steps {
-              echo "Current branch: ${env.BRANCH_NAME}"
+              
               
               //git url: 'https://github.com/IkobiLynch/spring-petclinic.git', branch: "${env.BRANCH_NAME}"
               dir('GD_CP_infra'){
@@ -24,6 +24,8 @@ pipeline {
 
               sh 'pwd'
               sh 'ls -al'
+
+              echo "Current branch: ${env.BRANCH_NAME}"
             }
         }
 
