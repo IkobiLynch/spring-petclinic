@@ -25,10 +25,11 @@ pipeline {
         stage('Static Code Analysis') {
             when { not { branch 'main' } }
             steps {
-                dir('spring-petclinic') {
-                    echo 'Running static code analysis...'
-                    sh './gradlew check'
-                }
+              sh 'pwd'
+              sh 'ls -al'
+              sh 'ls -al ../'
+              echo 'Running static code analysis...'
+              sh './gradlew check'
             }
         }
 
