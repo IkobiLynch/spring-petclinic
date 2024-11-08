@@ -38,58 +38,48 @@ pipeline {
         stage('Run Tests') {
             when { not { branch 'main' } }
             steps {
-                dir('spring-petclinic') {
-                    echo 'Running tests...'
-                    sh './gradlew test'
-                }
+              echo 'Running tests...'
+              sh './gradlew test'
             }
         }
 
         stage('Build Application') {
             steps {
-                dir('spring-petclinic') {
-                    echo 'Building application...'
-                    sh './gradlew build'
-                }
+              echo 'Building application...'
+              sh './gradlew build'
             }
         }
 
         stage('Tagging and Versioning') {
             when { branch 'main' }
             steps {
-                dir('spring-petclinic') {
-                    echo 'Updating version tag...'
-                    sh './gradlew release'
-                    script {
-                        def version = readFile('version.txt').trim()
-                        env.APP_VERSION = version
-                        currentBuild.displayName = "v${APP_VERSION}"
-                    }
-                }
+              echo 'Updating version tag...'
+              sh './gradlew release'
+              script {
+                def version = readFile('version.txt').trim()
+                env.APP_VERSION = version
+                currentBuild.displayName = "v${APP_VERSION}"
+              }
             }
         }
 
         stage('Create Docker Image') {
             steps {
-                dir('spring-petclinic') {
-                    script {
-                        def imageTag = env.BRANCH_NAME == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
-                        sh "docker build -t ${DOCKER_IMAGE_NAME}:${imageTag} ."
-                    }
-                }
+              script {
+                def imageTag = env.BRANCH_NAME == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
+                sh "docker build -t ${DOCKER_IMAGE_NAME}:${imageTag} ."
+              }    
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                dir('spring-petclinic') {
-                    script {
-                        def imageTag = env.BRANCH_NAME == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
-                        docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
-                            sh "docker push ${DOCKER_IMAGE_NAME}:${imageTag}"
-                        }
-                    }
-                }
+              script {
+                def imageTag = env.BRANCH_NAME == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
+                docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                  sh "docker push ${DOCKER_IMAGE_NAME}:${imageTag}"
+                }  
+              }
             }
         }
 
