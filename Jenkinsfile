@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Clone Repositories') {
             steps {
-              git url: 'https://github.com/IkobiLynch/spring-petclinic.git', branch: "${env.BRANCH_NAME}"
+              //git url: 'https://github.com/IkobiLynch/spring-petclinic.git', branch: "${env.BRANCH_NAME}"
               
               git url: 'https://github.com/IkobiLynch/GD_CP_infra.git', branch: 'main'
 
@@ -100,8 +100,8 @@ pipeline {
 
                     // Use Ansible playbook in the infrastructure repo to deploy to EC2
                     withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
-                        ansiblePlaybook inventory: 'infrastructure/ansible/inventory.ini',
-                                        playbook: 'infrastructure/ansible/deploy_app.yml',
+                        ansiblePlaybook inventory: 'GD_CP_infra/ansible/inventory.ini',
+                                        playbook: 'GD_CP_infra/ansible/deploy_app.yml',
                                         extras: "--private-key=${SSH_KEY} --extra-vars 'docker_image=${DOCKER_IMAGE_NAME}:${imageTag} db_url=${DB_URL}'"
                     }
                 }
