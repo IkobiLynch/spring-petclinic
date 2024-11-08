@@ -13,6 +13,8 @@ pipeline {
     stages {
         stage('Clone Repositories') {
             steps {
+              sh 'git branch'
+              
               //git url: 'https://github.com/IkobiLynch/spring-petclinic.git', branch: "${env.BRANCH_NAME}"
               dir('GD_CP_infra'){
                 git url: 'https://github.com/IkobiLynch/GD_CP_infra.git', branch: 'main'
