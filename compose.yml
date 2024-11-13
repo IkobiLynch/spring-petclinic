@@ -6,7 +6,7 @@ services:
       - "8080:8080"
   
     environment:
-      - DB_URL=jdbc:postgresql://db:5432/mydatabase
+      - DB_URL=terraform-20241102004139871700000001.cma1xp5df2gi.us-east-1.rds.amazonaws.com
       - DB_USER=myuser
       - DB_PASSWORD=mypassword
 
