@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        db_password = credentials('db_password')
+        DB_PASSWORD = credentials('db_password')
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_IMAGE_NAME = 'ikobilynch/spring-petclinic'
         DB_URL = "terraform-20241102004139871700000001.cma1xp5df2gi.us-east-1.rds.amazonaws.com" 
