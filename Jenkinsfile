@@ -8,6 +8,7 @@ pipeline {
         DOCKER_IMAGE_NAME = 'ikobilynch/spring-petclinic'
         DB_URL = "terraform-20241102004139871700000001.cma1xp5df2gi.us-east-1.rds.amazonaws.com" 
         SSH_CREDENTIALS_ID = 'ssh-key-id'  // Jenkins ID for the stored SSH private key
+        SPRING_PROFILES_ACTIVE = 'postgres'
     }
 
     stages {
@@ -30,7 +31,7 @@ pipeline {
         }
 
         stage('Static Code Analysis') {
-            when { not { branch 'main' } }
+            when { not { branch 'orgin/main' } }
             steps {
               sh 'pwd'
               sh 'ls -al'
@@ -40,7 +41,7 @@ pipeline {
         }
 
         stage('Run Tests') {
-            when { not { branch 'main' } }
+            when { not { branch 'origin/main' } }
             steps {
               echo 'Running tests...'
               sh './gradlew test'
@@ -55,7 +56,7 @@ pipeline {
         }
 
         stage('Tagging and Versioning') {
-            when { branch 'main' }
+            when { branch 'origin/main' }
             steps {
               echo 'Updating version tag...'
               sh './gradlew release'
@@ -88,7 +89,7 @@ pipeline {
         }
 
         stage('Deploy to AWS EC2 Instances') {
-            when { branch 'main' }
+            when { branch 'origin/main' }
             steps {
                 input message: 'Deploy to production environment?'
                 script {
