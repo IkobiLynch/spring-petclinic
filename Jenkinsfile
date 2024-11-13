@@ -109,6 +109,7 @@ pipeline {
 
     post {
       cleanup {
+        sleep(3000)
         cleanWs()
       }
         success {
