@@ -35,7 +35,7 @@ pipeline {
         stage('Static Code Analysis') {
             when { not { branch 'main' } }
             steps {
-              echo "Current branch: ${env.BRANCH_NAME}"
+              echo "Current branch: ${env.GIT_BRANCH}"
               sh 'pwd'
               sh 'ls -al'
               echo 'Running static code analysis...'
@@ -74,7 +74,7 @@ pipeline {
         stage('Create Docker Image') {
             steps {
               script {
-                def imageTag = env.BRANCH_NAME == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
+                def imageTag = env.GIT_BRANCH == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
                 sh "docker build -t ${DOCKER_IMAGE_NAME}:${imageTag} ."
               }    
             }
@@ -83,7 +83,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
               script {
-                def imageTag = env.BRANCH_NAME == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
+                def imageTag = env.GIT_BRANCH == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
                 docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
                   sh "docker push ${DOCKER_IMAGE_NAME}:${imageTag}"
                 }  
