@@ -6,13 +6,15 @@ pipeline {
         DB_PASSWORD = credentials('db_password')
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_IMAGE_NAME = 'ikobilynch/spring-petclinic'
-        DB_URL = "terraform-20241102004139871700000001.cma1xp5df2gi.us-east-1.rds.amazonaws.com" 
+        POSTGRES_URL = "jdbc:postgresql://ilynch-db.cma1xp5df2gi.us-east-1.rds.amazonaws.com:5432/springAppDB"
+        POSTGRES_USER = "myusername"
+        POSTGRES_PASS  = credentials('db_password')
         SSH_CREDENTIALS_ID = 'ssh-key-id'  // Jenkins ID for the stored SSH private key
         SPRING_PROFILES_ACTIVE = 'postgres'
     }
 
     stages {
-        stage('Clone Repositories') {
+        /*stage('Clone Repositories') {
             steps {
               
               
@@ -28,11 +30,12 @@ pipeline {
 
               echo "Current branch: ${env.BRANCH_NAME}"
             }
-        }
+        } */
 
         stage('Static Code Analysis') {
-            when { not { branch 'orgin/main' } }
+            when { not { branch 'main' } }
             steps {
+              echo "Current branch: ${env.BRANCH_NAME}"
               sh 'pwd'
               sh 'ls -al'
               echo 'Running static code analysis...'
@@ -41,7 +44,7 @@ pipeline {
         }
 
         stage('Run Tests') {
-            when { not { branch 'origin/main' } }
+            when { not { branch 'main' } }
             steps {
               echo 'Running tests...'
               sh './gradlew test'
@@ -56,7 +59,7 @@ pipeline {
         }
 
         stage('Tagging and Versioning') {
-            when { branch 'origin/main' }
+            when { branch 'main' }
             steps {
               echo 'Updating version tag...'
               sh './gradlew release'
@@ -89,7 +92,7 @@ pipeline {
         }
 
         stage('Deploy to AWS EC2 Instances') {
-            when { branch 'origin/main' }
+            when { branch 'main' }
             steps {
                 input message: 'Deploy to production environment?'
                 script {
@@ -109,7 +112,7 @@ pipeline {
 
     post {
       cleanup {
-        sleep(3000)
+        sleep(500)
         cleanWs()
       }
         success {
