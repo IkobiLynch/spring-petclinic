@@ -83,8 +83,11 @@ pipeline {
                   returnStdout: true
                 ).trim()
                 // Create new version tag
-                def newVersion = sh(script: "semver bump minor ${previousTag}", returnStdout: true).trim()
-
+                def newVersion = sh(
+                    script: "python3 -c 'import semver; print(semver.VersionInfo.parse(\"${previousTag}\").bump_minor())'",
+                    returnStdout: true
+                  ).trim()
+                  
                 // Create and push the new tag
                 sh 'git tag ${newVersion}'
                 sh 'git push origin ${newVersion}'
