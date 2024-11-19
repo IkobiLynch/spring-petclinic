@@ -33,7 +33,11 @@ pipeline {
         } */
 
         stage('Static Code Analysis') {
-            when { not { branch 'origin/main' } }
+            when { 
+              expression {
+                return env.GIT_BRANCH != 'origin/main'
+              } 
+            }
             steps {
               echo "Current branch: ${env.GIT_BRANCH}"
               sh 'pwd'
@@ -44,7 +48,11 @@ pipeline {
         }
 
         stage('Run Tests') {
-            when { not { branch 'origin/main' } }
+            when { 
+              expression {
+                return env.GIT_BRANCH != 'origin/main'
+              }  
+            }
             steps {
               echo 'Running tests...'
               sh './gradlew test'
@@ -59,7 +67,11 @@ pipeline {
         }
 
         stage('Tagging and Versioning') {
-            when { branch 'origin/main' }
+            when { 
+              expression {
+                return env.GIT_BRANCH == 'origin/main'
+              } 
+             }
             steps {
               script {
                 // Install semver
@@ -105,7 +117,11 @@ pipeline {
         }
 
         stage('Deploy to AWS EC2 Instances') {
-            when { branch 'origin/main' }
+            when { 
+              expression {
+                return env.GIT_BRANCH == 'origin/main'
+              } 
+             }
             steps {
                 input message: 'Deploy to production environment?'
                 script {
