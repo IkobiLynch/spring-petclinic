@@ -82,12 +82,20 @@ pipeline {
                   script: "git describe --tags --abbrev=0 || echo '0.0.0'",
                   returnStdout: true
                 ).trim()
+
+                // Remove v prefix
+                if (previousTag.startsWith("v")) {
+                  previousTag = previousTag.substring(1)
+                }
                 // Create new version tag
                 def newVersion = sh(
                     script: "python3 -c 'import semver; print(semver.VersionInfo.parse(\"${previousTag}\").bump_minor())'",
                     returnStdout: true
                   ).trim()
-                  
+
+                // Add the v prefix back
+                newVersion = "v${newVersion}"
+
                 // Create and push the new tag
                 sh 'git tag ${newVersion}'
                 sh 'git push origin ${newVersion}'
