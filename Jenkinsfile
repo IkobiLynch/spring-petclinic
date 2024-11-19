@@ -61,19 +61,26 @@ pipeline {
         stage('Tagging and Versioning') {
             when { branch 'origin/main' }
             steps {
-              sh 'pip install semver'
+              script {
+                // Install semver
+                sh 'pip install semver'
 
-              def previousTag = sh(
-                script: "git describe --tags --abbrev=0 || echo '0.0.0'",
-                returnStdout: true
-              ).trim()
-              def newVersion = sh(script: "semver bump minor ${previousTag}", returnStdout: true).trim()
+                // Get previous tag or set default
+                def previousTag = sh(
+                  script: "git describe --tags --abbrev=0 || echo '0.0.0'",
+                  returnStdout: true
+                ).trim()
+                // Create new version tag
+                def newVersion = sh(script: "semver bump minor ${previousTag}", returnStdout: true).trim()
 
-              sh 'git tag ${newVersion}'
-              sh 'git push origin ${newVersion}'
-              env.APP_VERSION = version
-              currentBuild.displayName = "v${APP_VERSION}"
-              
+                // Create and push the new tag
+                sh 'git tag ${newVersion}'
+                sh 'git push origin ${newVersion}'
+
+                // Set env variables
+                env.APP_VERSION = version
+                currentBuild.displayName = "v${APP_VERSION}"
+                }    
             }
         }
 
