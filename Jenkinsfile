@@ -75,7 +75,7 @@ pipeline {
             steps {
               script {
                 // Install semver
-                sh 'pip install semver'
+                //sh 'pip install semver'
 
                 // Get previous tag or set default
                 def previousTag = sh(
