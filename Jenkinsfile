@@ -19,7 +19,7 @@ pipeline {
               script {
                 checkout([
                   $class: 'GitSCM',
-                  branches: [[name: "${env.Branch_name}"]],
+                  branches: [[name: "${env.GIT_BRANCH}"]],
                   userRemoteConfigs: [[url: 'https://github.com/IkobiLynch/spring-petclinic.git']]
                 ])
               }
