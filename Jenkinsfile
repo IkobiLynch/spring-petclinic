@@ -14,23 +14,17 @@ pipeline {
     }
 
     stages {
-        /*stage('Clone Repositories') {
+        stage('Checkout Code') {
             steps {
-              
-              
-              //git url: 'https://github.com/IkobiLynch/spring-petclinic.git', branch: "${env.BRANCH_NAME}"
-              dir('GD_CP_infra'){
-                git url: 'https://github.com/IkobiLynch/GD_CP_infra.git', branch: 'main'
-                sh 'pwd'
-                sh 'ls -al'
+              script {
+                checkout([
+                  $class: 'GitSCM',
+                  branches: [[name: "$env.Branch_name"]],
+                  userRemoteConfigs: [[url: 'https://github.com/IkobiLynch/spring-petclinic.git']]
+                ])
               }
-
-              sh 'pwd'
-              sh 'ls -al'
-
-              echo "Current branch: ${env.BRANCH_NAME}"
             }
-        } */
+        } 
 
         stage('Static Code Analysis') {
             when { 
