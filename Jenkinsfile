@@ -98,7 +98,7 @@ pipeline {
 
                 // Create and push the new tag
                 sh 'git tag ${newVersion}'
-                sh 'git push origin HEAD:${env.GIT_BRANCH} ${newVersion}'
+                sh "git push origin HEAD:${env.GIT_BRANCH} ${newVersion}"
 
                 // Set env variables
                 env.APP_VERSION = version
