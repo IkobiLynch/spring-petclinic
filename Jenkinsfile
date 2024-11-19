@@ -93,12 +93,12 @@ pipeline {
                     returnStdout: true
                   ).trim()
 
-                // Add the v prefix back
-                newVersion = "v${newVersion}"
-
                 // Create and push the new tag
-                sh 'git tag ${newVersion}'
-                sh "git push origin HEAD:${env.GIT_BRANCH} ${newVersion}"
+                sh 'git tag v${newVersion}'
+                // Push the new tag
+                sh "git push origin v${newVersion}"
+                
+                //sh "git push origin HEAD:${env.GIT_BRANCH}"
 
                 // Set env variables
                 env.APP_VERSION = version
