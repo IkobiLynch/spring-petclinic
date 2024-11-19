@@ -33,7 +33,7 @@ pipeline {
         } */
 
         stage('Static Code Analysis') {
-            when { not { branch 'main' } }
+            when { not { branch 'origin/main' } }
             steps {
               echo "Current branch: ${env.GIT_BRANCH}"
               sh 'pwd'
@@ -44,7 +44,7 @@ pipeline {
         }
 
         stage('Run Tests') {
-            when { not { branch 'main' } }
+            when { not { branch 'origin/main' } }
             steps {
               echo 'Running tests...'
               sh './gradlew test'
@@ -59,22 +59,28 @@ pipeline {
         }
 
         stage('Tagging and Versioning') {
-            when { branch 'main' }
+            when { branch 'origin/main' }
             steps {
-              echo 'Updating version tag...'
-              sh './gradlew release'
-              script {
-                def version = readFile('version.txt').trim()
-                env.APP_VERSION = version
-                currentBuild.displayName = "v${APP_VERSION}"
-              }
+              sh 'pip install semver'
+
+              def previousTag = sh(
+                script: "git describe --tags --abbrev=0 || echo '0.0.0'",
+                returnStdout: true
+              ).trim()
+              def newVersion = sh(script: "semver bump minor ${previousTag}", returnStdout: true).trim()
+
+              sh 'git tag ${newVersion}'
+              sh 'git push origin ${newVersion}'
+              env.APP_VERSION = version
+              currentBuild.displayName = "v${APP_VERSION}"
+              
             }
         }
 
         stage('Create Docker Image') {
             steps {
               script {
-                def imageTag = env.GIT_BRANCH == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
+                def imageTag = env.GIT_BRANCH == 'origin/main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
                 sh "docker build -t ${DOCKER_IMAGE_NAME}:${imageTag} ."
               }    
             }
@@ -83,7 +89,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
               script {
-                def imageTag = env.GIT_BRANCH == 'main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
+                def imageTag = env.GIT_BRANCH == 'origin/main' ? env.APP_VERSION : env.GIT_COMMIT[0..6]
                 docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
                   sh "docker push ${DOCKER_IMAGE_NAME}:${imageTag}"
                 }  
@@ -92,7 +98,7 @@ pipeline {
         }
 
         stage('Deploy to AWS EC2 Instances') {
-            when { branch 'main' }
+            when { branch 'origin/main' }
             steps {
                 input message: 'Deploy to production environment?'
                 script {
@@ -103,7 +109,7 @@ pipeline {
                     withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
                         ansiblePlaybook inventory: 'GD_CP_infra/ansible/inventory.ini',
                                         playbook: 'GD_CP_infra/ansible/deploy_app.yml',
-                                        extras: "--private-key=${SSH_KEY} --extra-vars 'docker_image=${DOCKER_IMAGE_NAME}:${imageTag} db_url=${DB_URL}'"
+                                        extras: "--private-key=${SSH_KEY} --extra-vars 'image_name=${DOCKER_IMAGE_NAME}:${imageTag} POSTGRES_URL=${POSTGRES_URL} POSTGRES_USER=${POSTGRES_USER} POSTGRES_PASS=${POSTGRES_PASS} db_port=5432'"
                     }
                 }
             }
@@ -112,7 +118,7 @@ pipeline {
 
     post {
       cleanup {
-        sleep(500)
+        // sleep(500)
         cleanWs()
       }
         success {

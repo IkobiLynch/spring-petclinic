@@ -1,7 +1,7 @@
 # Build application using gradle
 
 # Use gradles jdk running on ubuntu jammy jellyfish as base image
-FROM gradle:8.7.0-jdk-jammy as build
+FROM gradle:8.7.0-jdk-jammy AS build
 
 # Copy source code and change user to prevent permisison issues.
 COPY --chown=gradle:gradle . /home/gradle/src 
