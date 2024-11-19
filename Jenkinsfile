@@ -17,11 +17,13 @@ pipeline {
         stage('Checkout Code') {
             steps {
               script {
+                echo "Branch name: ${env.BRANCH_NAME}"
                 checkout([
                   $class: 'GitSCM',
                   branches: [[name: "${env.GIT_BRANCH}"]],
                   userRemoteConfigs: [[url: 'https://github.com/IkobiLynch/spring-petclinic.git']]
                 ])
+                echo "Branch name: ${env.BRANCH_NAME}"
               }
             }
         } 
@@ -88,7 +90,7 @@ pipeline {
                   ).trim()
 
                 // Create and push the new tag
-                sh 'git tag v${newVersion}'
+                sh "git tag v${newVersion}"
                 // Push the new tag
                 sh "git push origin v${newVersion}"
                 
