@@ -103,7 +103,7 @@ pipeline {
                       sh "git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}"
                   }
                 }
-                
+
                 // Set env variables
                 env.APP_VERSION = newVersion
                 currentBuild.displayName = "v${APP_VERSION}"
@@ -156,8 +156,13 @@ pipeline {
 
     post {
       cleanup {
-        // sleep(500)
-        cleanWs()
+        script {
+          sh 'docker builder prune -f'
+          sh 'docker image prune -f'
+          sh 'docker container prune -f'
+          // sleep(500)
+          cleanWs()
+        }
       }
         success {
             echo 'Pipeline completed successfully!'
