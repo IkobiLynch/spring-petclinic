@@ -91,13 +91,19 @@ pipeline {
 
                 // Create and push the new tag
                 sh "git tag v${newVersion}"
+
                 // Push the new tag
-                sh "git push origin v${newVersion}"
+                withCredentials([usernamePassword(credentialsId: 'github_credentials', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
+                  sh """
+                  git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/sping-petclinic.git ${newVersion}
+                  """
+                }
+                //sh "git push origin v${newVersion}"
                 
                 //sh "git push origin HEAD:${env.GIT_BRANCH}"
 
                 // Set env variables
-                env.APP_VERSION = version
+                env.APP_VERSION = newVersion
                 currentBuild.displayName = "v${APP_VERSION}"
                 }    
             }
