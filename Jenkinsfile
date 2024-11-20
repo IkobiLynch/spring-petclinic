@@ -95,7 +95,7 @@ pipeline {
                 // Push the new tag
                 withCredentials([usernamePassword(credentialsId: 'github_credentials', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
                   sh """
-                  git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/sping-petclinic.git ${newVersion}
+                  git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}
                   """
                 }
                 //sh "git push origin v${newVersion}"
