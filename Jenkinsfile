@@ -70,9 +70,7 @@ pipeline {
              }
             steps {
               script {
-                // Install semver
-                //sh 'pip install semver'
-
+              
                 // Get previous tag or set default
                 def previousTag = sh(
                   script: "git describe --tags --abbrev=0 || echo '0.0.0'",
@@ -98,9 +96,6 @@ pipeline {
                   git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}
                   """
                 }
-                //sh "git push origin v${newVersion}"
-                
-                //sh "git push origin HEAD:${env.GIT_BRANCH}"
 
                 // Set env variables
                 env.APP_VERSION = newVersion
