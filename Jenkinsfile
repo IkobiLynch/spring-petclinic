@@ -87,16 +87,23 @@ pipeline {
                     returnStdout: true
                   ).trim()
 
-                // Create and push the new tag
-                sh "git tag v${newVersion}"
+                // Check if the tag already exists
+                def tagExists = sh(
+                    script: "git tag -l v${newVersion}",
+                    returnStdout: true
+                  ).trim()
 
-                // Push the new tag
-                withCredentials([usernamePassword(credentialsId: 'github_credentials', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                  sh """
-                  git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}
-                  """
+
+                if (tagExists) {
+                  echo "Tag v${newVersion} already exists. Skipping tag creation."
+                } else {
+                  // Create and push the new tag
+                  sh "git tag ${newVersion}"
+                  withCredentials([usernamePassword(credentialsId: 'github_credentials', passwordVariable: 'GITHUB_USERNAME', usernameVariable: 'GITHUB_TOKEN')]) {
+                      sh "git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}"
+                  }
                 }
-
+                
                 // Set env variables
                 env.APP_VERSION = newVersion
                 currentBuild.displayName = "v${APP_VERSION}"
