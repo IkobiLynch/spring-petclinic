@@ -6,7 +6,8 @@ pipeline {
         DB_PASSWORD = credentials('db_password')
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_IMAGE_NAME = 'ikobilynch/spring-petclinic'
-        POSTGRES_URL = "ilynch-db.cma1xp5df2gi.us-east-1.rds.amazonaws.com"
+        POSTGRES_URL = "jdbc:postgresql://ilynch-db.cma1xp5df2gi.us-east-1.rds.amazonaws.com:5432/springAppDB"
+        DB_HOST = "ilynch-db.cma1xp5df2gi.us-east-1.rds.amazonaws.com"
         POSTGRES_USER = "myusername"
         POSTGRES_PASS  = credentials('db_password')
         SSH_CREDENTIALS_ID = 'ssh-key-id'  // Jenkins ID for the stored SSH private key
@@ -148,7 +149,7 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
                     ansiblePlaybook inventory: 'GD_CP_infra/Ansible/inventory.ini',
                                     playbook: 'GD_CP_infra/Ansible/playbooks/deploy_app.yml',
-                                    extras: "--private-key=${SSH_KEY} --extra-vars 'image_name=${DOCKER_IMAGE_NAME}:${imageTag} POSTGRES_URL=${POSTGRES_URL} POSTGRES_USER=${POSTGRES_USER} POSTGRES_PASS=${POSTGRES_PASS} db_port=5432 SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}'"
+                                    extras: "--private-key=${SSH_KEY} --extra-vars 'image_name=${DOCKER_IMAGE_NAME}:${imageTag} POSTGRES_URL=${POSTGRES_URL} POSTGRES_USER=${POSTGRES_USER} POSTGRES_PASS=${POSTGRES_PASS} SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} DB_HOST=${DB_HOST} db_port=5432'"
                 }
               }
             }
