@@ -24,6 +24,8 @@ pipeline {
                   userRemoteConfigs: [[url: 'https://github.com/IkobiLynch/spring-petclinic.git']]
                 ])
                 echo "Branch name: ${env.BRANCH_NAME}"
+
+                sh "git clone 'https://github.com/IkobiLynch/GD_CP_infra.git'"
               }
             }
         } 
@@ -138,8 +140,6 @@ pipeline {
               } 
              }
             steps {
-              git branch: 'main',
-                url: 'https://github.com/IkobiLynch/GD_CP_infra.git'
               input message: 'Deploy to production environment?'
               script {
                 // Define a variable for the image tag
