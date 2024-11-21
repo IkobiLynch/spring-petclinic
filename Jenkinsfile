@@ -148,7 +148,7 @@ pipeline {
                 // Use Ansible playbook in the infrastructure repo to deploy to EC2
                 withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
                     ansiblePlaybook inventory: 'GD_CP_infra/ansible/inventory.ini',
-                                    playbook: 'GD_CP_infra/ansible/deploy_app.yml',
+                                    playbook: 'GD_CP_infra/ansible/playbooks/deploy_app.yml',
                                     extras: "--private-key=${SSH_KEY} --extra-vars 'image_name=${DOCKER_IMAGE_NAME}:${imageTag} POSTGRES_URL=${POSTGRES_URL} POSTGRES_USER=${POSTGRES_USER} POSTGRES_PASS=${POSTGRES_PASS} db_port=5432'"
                 }
               }
