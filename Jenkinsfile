@@ -138,20 +138,22 @@ pipeline {
               } 
              }
             steps {
-                input message: 'Deploy to production environment?'
-                script {
-                    // Define a variable for the image tag
-                    def imageTag = env.APP_VERSION
+              git branch: 'main',
+                url: 'https://github.com/IkobiLynch/GD_CP_infra.git'
+              input message: 'Deploy to production environment?'
+              script {
+                // Define a variable for the image tag
+                def imageTag = env.APP_VERSION
 
-                    // Use Ansible playbook in the infrastructure repo to deploy to EC2
-                    withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
-                        ansiblePlaybook inventory: 'GD_CP_infra/ansible/inventory.ini',
-                                        playbook: 'GD_CP_infra/ansible/deploy_app.yml',
-                                        extras: "--private-key=${SSH_KEY} --extra-vars 'image_name=${DOCKER_IMAGE_NAME}:${imageTag} POSTGRES_URL=${POSTGRES_URL} POSTGRES_USER=${POSTGRES_USER} POSTGRES_PASS=${POSTGRES_PASS} db_port=5432'"
-                    }
+                // Use Ansible playbook in the infrastructure repo to deploy to EC2
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
+                    ansiblePlaybook inventory: 'GD_CP_infra/ansible/inventory.ini',
+                                    playbook: 'GD_CP_infra/ansible/deploy_app.yml',
+                                    extras: "--private-key=${SSH_KEY} --extra-vars 'image_name=${DOCKER_IMAGE_NAME}:${imageTag} POSTGRES_URL=${POSTGRES_URL} POSTGRES_USER=${POSTGRES_USER} POSTGRES_PASS=${POSTGRES_PASS} db_port=5432'"
                 }
+              }
             }
-        }
+          }
     }
 
     post {
