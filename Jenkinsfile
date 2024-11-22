@@ -149,7 +149,7 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-id', keyFileVariable: 'SSH_KEY')]) {
                     ansiblePlaybook inventory: 'GD_CP_infra/Ansible/inventory.ini',
                                     playbook: 'GD_CP_infra/Ansible/playbooks/deploy_app.yml',
-                                    extras: "--private-key=${SSH_KEY} --extra-vars 'image_name=${DOCKER_IMAGE_NAME}:${imageTag} POSTGRES_URL=${POSTGRES_URL} POSTGRES_USER=${POSTGRES_USER} POSTGRES_PASS=${POSTGRES_PASS} SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} DB_HOST=${DB_HOST} db_port=5432'"
+                                    extras: "--private-key=${SSH_KEY} --extra-vars 'image_name=${DOCKER_IMAGE_NAME}:${imageTag} POSTGRES_USER=${POSTGRES_USER} POSTGRES_PASS=${POSTGRES_PASS} SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} DB_HOST=${DB_HOST} db_port=5432'"
                 }
               }
             }
