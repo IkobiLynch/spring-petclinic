@@ -68,11 +68,6 @@ pipeline {
         }
 
         stage('Tagging and Versioning') {
-            when { 
-              expression {
-                return env.GIT_BRANCH == 'origin/main'
-              } 
-             }
             steps {
               script {
               
@@ -86,32 +81,47 @@ pipeline {
                 if (previousTag.startsWith("v")) {
                   previousTag = previousTag.substring(1)
                 }
-                // Create new version tag
+
+                // Detmine version bump based on branch
+                def bumpType = 'bump_patch' // Default for non main branches
+
+                if (env.GIT_BRANCH == 'origin/main') {
+                  bumpType = 'bump_minor'
+                } else if (env.GIT_BRANCH.startsWith('origin/release/')) {
+                  bumpType = 'bump_major'
+                }
+
+                // Create new version tag & increment based on branch
                 def newVersion = sh(
-                    script: "python3 -c 'import semver; print(semver.VersionInfo.parse(\"${previousTag}\").bump_minor())'",
+                    script: "python3 -c 'import semver; print(semver.VersionInfo.parse(\"${previousTag}\").${bumpType}())'",
                     returnStdout: true
                   ).trim()
 
-                // Check if the tag already exists
-                def tagExists = sh(
-                    script: "git tag -l v${newVersion}",
+                // Check if app code changed
+                def hasCodeChanges = sh(
+                  script: "git diff --name-only HEAD^ HEAD | grep 'src/'",
+                  returnStdout: true
+                )
+
+                if (hasCodeChanges) {
+                  def tagExists = sh(
+                    script: "git tag -l v${newVersion}", 
                     returnStdout: true
                   ).trim()
 
-
-                if (tagExists) {
-                  echo "Tag v${newVersion} already exists. Skipping tag creation."
-                } else {
-                  // Create and push the new tag
-                  sh "git tag ${newVersion}"
-                  withCredentials([usernamePassword(credentialsId: 'github_credentials', passwordVariable: 'GITHUB_USERNAME', usernameVariable: 'GITHUB_TOKEN')]) {
-                      sh "git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}"
+                  if (!tagExists) {
+                    sh "git tag v${newVersion}"
+                    withCredentials([usernamePassword(credentialsId: 'github_credentials', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
+                        sh "git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}"
+                    }
                   }
+                } else {
+                  echo "No application code changes detected. Skipping version bump."
                 }
 
                 // Set env variables
                 env.APP_VERSION = newVersion
-                }    
+              }    
             }
         }
 
