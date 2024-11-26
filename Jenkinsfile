@@ -73,7 +73,7 @@ pipeline {
               
                 // Get previous tag or set default
                 def previousTag = sh(
-                  script: "git describe --tags --abbrev=0 || echo '0.0.0'",
+                  script: "git describe --abbrev=0 || echo '0.0.0'",
                   returnStdout: true
                 ).trim()
 
