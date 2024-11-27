@@ -71,10 +71,18 @@ pipeline {
             steps {
               script {
                 
-                //
+                // Check if app code changed
+                def hasCodeChanges = sh(
+                  script: "git diff --name-only HEAD^ HEAD | grep src/ || echo 'no-changes'",
+                  returnStdout: true
+                )
+
+                // Get latest tag in repo
+                sh 'git fetch --tags'
+
                 // Get previous tag or set default
                 def previousTag = sh(
-                  script: "git describe --abbrev=0 || echo '0.0.0'",
+                  script: "git describe --tags --abbrev=0 || echo '0.0.0'",
                   returnStdout: true
                 ).trim()
 
@@ -83,28 +91,25 @@ pipeline {
                   previousTag = previousTag.substring(1)
                 }
 
-                // Detmine version bump based on branch
-                def bumpType = 'bump_patch' // Default for non main branches
+                if (hasCodeChanges == 'no-changes') {
+                  echo "No application code changes detected. Skipping version bump."
+                  env.APP_VERSION = previousTag
+                } else {
+                  // Detmine version bump based on branch
+                  def bumpType = 'bump_patch' // Default for non main branches
 
-                if (env.GIT_BRANCH == 'origin/main') {
-                  bumpType = 'bump_minor'
-                } else if (env.GIT_BRANCH.startsWith('origin/release/')) {
-                  bumpType = 'bump_major'
-                }
+                  if (env.GIT_BRANCH == 'origin/main') {
+                    bumpType = 'bump_minor'
+                  } else if (env.GIT_BRANCH.startsWith('origin/release/')) {
+                    bumpType = 'bump_major'
+                  }
 
-                // Create new version tag & increment based on branch
-                def newVersion = sh(
+                  // Create new version tag & increment based on branch
+                  def newVersion = sh(
                     script: "python3 -c 'import semver; print(semver.VersionInfo.parse(\"${previousTag}\").${bumpType}())'",
                     returnStdout: true
                   ).trim()
 
-                // Check if app code changed
-                def hasCodeChanges = sh(
-                  script: "git diff --name-only HEAD^ HEAD | grep 'src/'",
-                  returnStdout: true
-                )
-
-                if (hasCodeChanges) {
                   def tagExists = sh(
                     script: "git tag -l v${newVersion}", 
                     returnStdout: true
@@ -123,12 +128,10 @@ pipeline {
                         sh "git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}"
                     }
                   }
-                } else {
-                  echo "No application code changes detected. Skipping version bump."
+                  // Set env variable with new tag version
+                  env.APP_VERSION = newVersion
                 }
-
-                // Set env variables
-                env.APP_VERSION = newVersion
+                
               }    
             }
         }
