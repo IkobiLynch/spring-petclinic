@@ -122,6 +122,22 @@ pipeline {
                   ).trim()
                   echo "Commit Message: ${commitMessage}"
 
+                  def gitCommitterName = sh(
+                    script: "echo ${GIT_COMMITTER_NAME:-'Ikobi Test'}",
+                    returnStdout: true
+                  )
+                  echo "Committer name: ${gitCommitterName}"
+
+                  def gitCommitterEmail = sh(
+                    script: "echo ${GIT_COMMITTER_EMAIL:-'ikobi.lynch@macys.com'}",
+                    returnStdout: true
+                  )
+                  echo "Committer Email: ${gitCommitterEmail}"
+
+                  // Configure git with name & email
+                  sh "git config --global user.email '${gitCommitterEmail}'"
+                  sh "git config --global user.name '${gitCommitterName}'"
+
                   if (!tagExists) {
                     sh "git tag -a v${newVersion} -m '${commitMessage.replace("'", "\\'")}'"
                     withCredentials([usernamePassword(credentialsId: 'github_credentials', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
