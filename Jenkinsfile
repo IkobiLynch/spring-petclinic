@@ -111,7 +111,7 @@ pipeline {
                   ).trim()
 
                   def tagExists = sh(
-                    script: "git tag -l v${newVersion} || echo 'no-exist'", 
+                    script: "git tag -l v${newVersion}", 
                     returnStdout: true
                   ).trim()
                   
@@ -122,16 +122,10 @@ pipeline {
                   ).trim()
                   echo "Commit Message: ${commitMessage}"
 
-                  def gitCommitterName = sh(
-                    script: "echo ${GIT_COMMITTER_NAME:-'Ikobi Test'}",
-                    returnStdout: true
-                  )
+                  def gitCommitterName = env.GIT_COMMITTER_NAME ?: 'Ikobi Test'
                   echo "Committer name: ${gitCommitterName}"
 
-                  def gitCommitterEmail = sh(
-                    script: "echo ${GIT_COMMITTER_EMAIL:-'ikobi.lynch@macys.com'}",
-                    returnStdout: true
-                  )
+                  def gitCommitterEmail = env.GIT_COMMITTER_EMAIL ?: 'ikobi.lynch@macys.com'
                   echo "Committer Email: ${gitCommitterEmail}"
 
                   // Configure git with name & email
@@ -139,7 +133,7 @@ pipeline {
                   sh "git config --global user.name '${gitCommitterName}'"
 
                   // if tag don't exist make it and push to repo
-                  if (tagExists == 'no-exist') {
+                  if (!tagExists) {
                     sh "git tag -a v${newVersion} -m '${commitMessage.replace("'", "\\'")}'"
                     withCredentials([usernamePassword(credentialsId: 'github_credentials', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
                         sh "git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}"
