@@ -111,7 +111,7 @@ pipeline {
                   ).trim()
 
                   def tagExists = sh(
-                    script: "git tag -l v${newVersion}", 
+                    script: "git tag -l v${newVersion} || echo 'no-exist'", 
                     returnStdout: true
                   ).trim()
                   
@@ -138,7 +138,8 @@ pipeline {
                   sh "git config --global user.email '${gitCommitterEmail}'"
                   sh "git config --global user.name '${gitCommitterName}'"
 
-                  if (!tagExists) {
+                  // if tag don't exist make it and push to repo
+                  if (tagExists == 'no-exist') {
                     sh "git tag -a v${newVersion} -m '${commitMessage.replace("'", "\\'")}'"
                     withCredentials([usernamePassword(credentialsId: 'github_credentials', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
                         sh "git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}"
