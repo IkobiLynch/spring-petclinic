@@ -100,7 +100,7 @@ pipeline {
 
                 // Check if app code changed
                 def hasCodeChanges = sh(
-                  script: "git diff --name-only HEAD^ HEAD",
+                  script: "git diff --name-only HEAD^ HEAD | grep 'src/'",
                   returnStdout: true
                 )
 
