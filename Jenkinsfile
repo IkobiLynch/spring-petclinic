@@ -70,7 +70,8 @@ pipeline {
         stage('Tagging and Versioning') {
             steps {
               script {
-              
+                
+                //
                 // Get previous tag or set default
                 def previousTag = sh(
                   script: "git describe --abbrev=0 || echo '0.0.0'",
@@ -108,9 +109,16 @@ pipeline {
                     script: "git tag -l v${newVersion}", 
                     returnStdout: true
                   ).trim()
+                  
+                  // Create commit message var to be used in tag creation
+                  def commitMessage = sh(
+                    script: 'git log -1 --pretty=%B',
+                    returnStdout: true
+                  ).trim()
+                  echo "Commit Message: ${commitMessage}"
 
                   if (!tagExists) {
-                    sh "git tag v${newVersion}"
+                    sh "git tag -a v${newVersion} -m '${commitMessage.replace("'", "\\'")}'"
                     withCredentials([usernamePassword(credentialsId: 'github_credentials', passwordVariable: 'GITHUB_TOKEN', usernameVariable: 'GITHUB_USERNAME')]) {
                         sh "git push https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/IkobiLynch/spring-petclinic.git v${newVersion}"
                     }
